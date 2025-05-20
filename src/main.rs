@@ -37,7 +37,7 @@ where
         }
     }
     
-    fn insert(&mut self, key: K, value: V) -> DbResult<()> {
+    fn set(&mut self, key: K, value: V) -> DbResult<()> {
         self.data.insert(key, value);
         Ok(())
     }
@@ -54,19 +54,42 @@ where
         }
     }
     
+    fn contains(&self, key: &K) -> bool {
+        self.data.contains_key(key)
+    }
+    
+    fn keys(&self) -> Vec<K> {
+        self.data.keys().cloned().collect()
+    }
+    
+    fn len(&self) -> usize {
+        self.data.len()
+    }
+    
 }
 
-
-
-
-
-
-
-
-
-
-
-
 fn main() {
-    println!("Hello, world!");
+    let mut db = MemoryDb::<String, String>::new();
+    
+    db.set(String::from("name"), String::from("Rust Database")).unwrap();
+    db.set(String::from("version"), String::from("0.1.0")).unwrap();
+    
+    match db.get(&String::from("name")) {
+        Ok(value) => println!("Name: {}", value),
+        Err(e) => println!("Error: {}", e),
+    }
+    
+    let key = String::from("version");
+    if db.contains(&key) {
+        println!("Database has version information");
+    }
+    
+    match db.delete(&String::from("version")) {
+        Ok(_) => println!("Version information deleted"),
+        Err(e)  => println!("Error: {}", e),
+    }
+    
+    println!("Keys in database: {:?}", db.keys());
+    println!("Number of entries: {}", db.len());
+    
 }
